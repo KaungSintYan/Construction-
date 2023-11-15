@@ -1,0 +1,589 @@
+<template>
+    <div class="container-fluid"  @click="$store.commit('setActive', false)">  
+    <form  @submit.prevent="createData"> 
+     <div class="row">
+         <div class="col-md-12"> 
+            
+            <div class="block-title mt-2">
+                <strong> {{ $t('basic_info') }}</strong>
+                <!-- <button class="btn btn-primary" data-toggle="modal" data-target="#exampleModalCenter"> <span><font-awesome-icon icon="fa-solid fa-file-import"/></span> import</button> -->
+            </div>
+            <hr> 
+                   <ProjectName @projectData="getProjectName($event)"  /> 
+                   <span v-if="v$.FormData.order.project_id.$error" class="text-danger">
+                                <span v-if="v$.FormData.order.project_id.$errors[0].$message != ''" >
+                                    {{ $t('is_required', {'name': $t('project')}) }} 
+                                </span>                                                                                         
+                    </span> 
+                    <div class="form-group mt-3">
+                        <label for="title">
+                            <small><b>{{ $t('title_bd') }}</b></small>
+                        </label>
+                        <el-input type="text" class="" :placeholder="$t('please_enter')" id="title" v-model="FormData.order.title" clearable/>
+                        <!-- <span v-if="v$.FormData.order.title.$error" class="text-danger">
+                                <span v-if="v$.FormData.order.title.$errors[0].$message != ''" >
+                                    {{ $t('is_required', {'name': $t('title_bd')}) }} 
+                                </span>                                                                                         
+                            </span>  -->
+                    </div>
+
+                    <div class="col-md-3 m-0 p-0">
+                        <div class="form-group">
+                            <label for="storage_date"> 
+                                <span class="text-danger">*</span> <small><b>{{ $t('exit_date') }}</b></small>       
+                            </label>
+                            <el-date-picker :placeholder="$t('pick_a_day')" type="date" class=""  format="YYYY-MM-DD" value-format="YYYY-MM-DD"
+                             id="storage_date" style="width: 100%;"  v-model="FormData.order.application_date" clearable/>
+                        </div>
+                    </div>
+
+                     <!-- <Picker :titleName="$t('picker')" @pickerData="getPickerName($event)"  />
+                     <span v-if="v$.FormData.order.picker.$error" class="text-danger">
+                        <span v-if="v$.FormData.order.picker.$errors[0].$message != ''" >
+                            {{ $t('is_required', {'name': $t('picker')}) }} 
+                        </span>                                                                                         
+                    </span>   -->
+                    <!-- <div class="form-group">
+                        <label for=""> {{ $t('warehouse_auto') }} </label> <br>
+                        <el-input type="checkbox" checked data-toggle="toggle" data-size="lg">
+                    </div> -->
+
+                    <div class="form-group">
+                        <label for="">
+                            <span class="text-danger">*</span><small><b>{{ $t('material_details') }}</b></small>  
+                        </label>
+                        <div class="row mx-2 mb-4">
+                                <el-table :data="FormData.details" border style="width: 100%;">
+                                    <el-table-column fixed type="index" width="55" />                                    
+                                    <el-table-column :label="$t('material_name')" width="130px"> 
+                                        <template #default="scope">                                         
+                                            <el-input type="text" :placeholder="$t('please_choose')" class=""  v-model="scope.row.material_name" disabled clearable/>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column :label="$t('specification')" width="150px"> 
+                                        <template #default="scope">
+                                            <el-input type="text" :placeholder="$t('please_enter')" class="" v-model="scope.row.material_specification" disabled clearable/> 
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column :label="$t('brand')" width="100px"> 
+                                        <template #default="scope">
+                                            <el-input type="text" :placeholder="$t('please_enter')" class="" v-model="scope.row.material_brand" disabled clearable/>
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column :label="$t('material_classification')" width="200px"> 
+                                        <template #default="scope">
+                                            <el-input type="text" :placeholder="$t('please_enter')" class="" v-model="scope.row.material_classification" disabled clearable/> 
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column :label="$t('num_of_plants')" width="170px"> 
+                                        <template #default="scope">
+                                            <el-input type="number" :placeholder="$t('please_enter')" class="" v-model="scope.row.quantity" @keyup="checkNumberPlans(scope.row.instock_amount, scope.row.quantity)" clearable/> 
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column :label="$t('unit')"> 
+                                        <template #default="scope">
+                                            <el-input type="text" :placeholder="$t('please_enter')" class="" v-model="scope.row.material_unit" disabled clearable/> 
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column :label="$t('remark')" width="250px"> 
+                                        <template #default="scope">
+                                            <el-input type="textarea" :placeholder="$t('please_enter')" id="remark"
+                                             v-model="scope.row.remark" maxlength="500" autosize show-word-limit  /> 
+                                        </template>
+                                    </el-table-column>
+                                    <el-table-column fixed="right" :label="$t('operate')" width="120px">
+                                        <template #default="scope">
+                                            <small class="text-danger"  @click="deleteMaterial(scope.row.material_id)"> {{ $t('delete') }} </small>
+                                        </template>                                        
+                                    </el-table-column>
+                                </el-table>
+                            </div>
+                            <!-- <div class="row">
+                                <small class="mt-2 ml-3 mr-3">{{ $t('total') }} 0</small>
+                                <nav aria-label="Page navigation example">
+                                    <ul class="pagination">
+                                        <li class="page-item">
+                                            <a class="page-link" href="#" aria-label="Previous">
+                                                <span aria-hidden="true">&laquo;</span>
+                                                <span class="sr-only">Previous</span>
+                                            </a>
+                                        </li>
+                                        <li class="page-item"><a class="page-link" href="#">1</a></li>
+                                        <li class="page-item">
+                                        <a class="page-link" href="#" aria-label="Next">
+                                            <span aria-hidden="true">&raquo;</span>
+                                            <span class="sr-only">Next</span>
+                                        </a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                                <div class="mr-3 ml-2 row">
+                                    <small class="pt-1 mr-2 mt-1">{{ $t('go_to') }}</small>
+                                    <input type="text" class="form-control footer-input" value="1">
+                                    <small class="pt-1 ml-2 mt-1">{{ $t('page') }}</small>
+                                </div>
+                            </div> -->
+                            <div class="box-footer"  @click="showMaterialDialog()">
+                                <font-awesome-icon icon="fa-solid fa-circle-plus" style="color:cornflowerblue;" /> <span class="text-primary"> {{ $t('add_to') }} </span>
+                            </div>
+                     </div>
+                     <div class="form-group">
+                         <label for="remark">
+                            <small><b>{{ $t('remark') }}</b></small>
+                         </label>                      
+                        <el-input type="textarea" :placeholder="$t('please_enter')" id="remark" v-model="FormData.order.remark" maxlength="100" show-word-limit  />
+                     </div>
+                    <Picture @picture="getPicture($event)" />
+                    <Document @appendix="getDocument($event)" />
+                    <el-timeline>
+                         <el-timeline-item>
+                           <Approver @approverUser="getApproverUser($event)" />
+                         </el-timeline-item>
+                         <el-timeline-item>
+                             <Cc @ccUser="getCcUser($event)" />
+                           </el-timeline-item>
+                    </el-timeline>
+                    
+         </div>
+     </div>
+     <div class="footer-main pt-2 pl-3">      
+        <el-button type="primary" loading v-if="submitting">Submiting ...</el-button>     
+        <button type="submit" class="btn btn-primary btn-footer" v-if="!submitting"> {{ $t('submit') }} </button>
+     </div>
+    </form> 
+    </div>
+    <el-dialog v-model="dialogVisible" :title="titleHeader" width="60%" draggable>
+        <div class="container-fluid">
+            <div class="row mx-2 mb-4">
+                <el-table ref="multipleTableRef" :data="material" border style="width: 100%;"  @selection-change="handleSelectionChange">
+                    <el-table-column  fixed type="selection" width="55" />     
+                    <el-table-column prop="material_name" sortable  :label="$t('material_name')" width="200" />
+                    <el-table-column prop="specification" :label="$t('specification')" sortable width="160"/>
+                    <el-table-column prop="brand" :label="$t('brand')" width="100" sortable/>
+                    <el-table-column prop="classification" :label="$t('material_classification')" width="200" sortable/>
+                    <el-table-column prop="measure_unit" :label="$t('unit_of_measurement')" width="200" sortable/>
+                    <el-table-column prop="instock_amount" :label="$t('instock_amount')"  width="200"  sortable/>      
+                </el-table>
+            </div>
+            <div class="row">                    
+                <div class="col-sm-12 d-flex justify-content-end">
+                <el-pagination
+                    v-model:current-page="currentPage"
+                    v-model:page-size="pageSize"
+                    :page-sizes="[20, 100, 200, 300]"
+                    :small="small"
+                    :disabled="disabled"
+                    :background="background"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="total"
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    />                    
+                </div>
+            </div>
+
+        </div>
+        <template #footer>
+          <span class="dialog-footer">            
+            <el-button @click="dialogVisible = false">{{ $t('cancel') }}</el-button>
+            <el-button type="primary" @click="addMaterial()" >{{ $t('sure') }}</el-button>           
+          </span>
+        </template>
+    </el-dialog>   
+ </template>
+
+<script>
+import {authApi} from '@/http/authApi'
+import { toast } from 'vue3-toastify';
+import 'vue3-toastify/dist/index.css';
+import ProjectName from '@/components/Share/ProjectName.vue';
+// import Picker from '@/components/Share/Picker.vue';
+import Picture from '@/components/Share/Picture.vue';
+import Document from '@/components/Share/Document.vue';
+import Approver from '@/components/Share/ApproverUser.vue';
+import Cc from '@/components/Share/CcUser.vue';
+import useValidate from '@vuelidate/core'
+import { required} from '@vuelidate/validators'
+
+export function validName(name) {
+  let validNamePattern = new RegExp("^[a-zA-Z]+(?:[-'\\s][a-zA-Z]+)*$");
+  if (validNamePattern.test(name)){
+    return true;
+  }
+  return false;
+}
+export default {
+    name: 'OutboundOrderCreate',
+    data() {
+        return {
+            v$: useValidate(),
+            submitting: false,
+            FormData: {
+                order:{                        
+                        title: "",
+                        odd_number: "",
+                        application_date: new Date().toISOString().slice(0,10),      
+                        // picker: "",                        
+                        remark: "",                        
+                        picture: null,
+                        appendix: null,
+                        approver:[],
+                        cc: [],
+                        creation_time: "",
+                        project_id: "",  
+                        purchase_order_id: "",                       
+                        supplier: "",
+                        created_by_user: ""
+                    },
+                    details:[]               
+            },
+            detailCount: 1,
+            pictureImages: [] ,
+            appendixImages: [], 
+            showapprover: [],
+            showcc: [],
+            material: [],
+            selectedMaterial: [],
+            dialogVisible: false,
+            //pagination
+            background: false,
+            disabled: false,
+            small: false,
+            pageSize: 20,   
+            currentPage: 1,  
+            total: 0,   
+            titleName:"",
+
+        }
+    },
+    validations() {
+        return {
+            FormData: {
+                order:{                    
+                    // picker: {
+                    //      required,  
+                    // },
+                    project_id: {
+                        required,        
+                    },                    
+                    // title: {                      
+                    //     required, name_validation: {
+                    //         $validator: validName,                
+                    //     },  
+                    // },
+                }
+            }
+        }
+    },
+    components: {
+      ProjectName,  
+    //   Picker,
+      Picture,
+      Document,
+      Approver,
+      Cc    
+    }, 
+    created(){                
+        //this.getMaterial(); 
+    },
+    methods: {
+        checkNumberPlans(plan, num){
+            if(num > plan){
+                toast.warning(this.$t('num_of_plants')+ " is less than "+ plan, {
+                    position: toast.POSITION.TOP_CENTER,
+                    autoClose: 1000,
+                });
+            }           
+        },
+        handleSelectionChange(val){  
+            this.selectedMaterial = val;
+        },
+        handleSizeChange(val){
+           this.pageSize = val;
+           this.getMaterial();
+        },
+        handleCurrentChange(val){
+           this.currentPage =val;
+           this.getMaterial();
+        },  
+        getProjectName(data) {   
+         this.FormData.order.project_id = data;        
+        },
+        // getPickerName(data){
+        //     this.FormData.order.picker = data;   
+        // },
+        getPicture(data){
+         this.pictureImages = data;
+        },
+        getDocument(data){
+            this.appendixImages = data;          
+        },
+        getApproverUser(data){
+          this.showapprover = data;
+        },
+        getCcUser(data){
+          this.showcc = data;
+        },
+        showMaterialDialog(){
+            //alert(this.FormData.order.project_id)
+            if(this.FormData.order.project_id != "") {
+                this.getMaterial();
+                this.dialogVisible=true;
+            }
+            else{
+                toast.warning("please project name", {
+                    position: toast.POSITION.TOP_CENTER,
+                    autoClose: 1000,
+                });
+            }          
+        },
+        async getMaterial(){
+        let response = await authApi({
+                method: 'GET',
+                api: '/materialmanagement/project_inventory',
+                params: {
+                       project_id: this.FormData.order.project_id,
+                       keyword: '',             
+                       page: '',
+                       limit: ''
+                }  
+        });       
+        this.material = response.data.data;
+        this.total = response.data.total;    
+       },
+      
+       addMaterial() { 
+        this.selectedMaterial.forEach((val, index)=>{
+                    let detail= {                      
+                        quantity: "",                       
+                        remark: "",                        
+                        otherproperties: "",
+                        outbound_order_id: "",                        
+                        material_id: val.material_id,
+                        material_name: val.material_name,
+                        material_specification: val.specification,
+                        material_classification: val.classification,
+                        material_brand: val.brand,
+                        material_unit: val.measure_unit,
+                        instock_amount: val.instock_amount,
+                    }   
+                    let material = this.FormData.details.find((x=> x.material_id == val.inventory_id));
+                    if(material == undefined){
+                        this.FormData.details.push(detail);  
+                    }  
+        });        
+           this.dialogVisible = false;  
+        },
+        deleteMaterial(id){
+            this.FormData.details =this.FormData.details.filter(x=> x.material_id != id);  
+            this.selectedMaterial.forEach((row) => { 
+                if(row.inventoryid == id){
+                    this.$refs.multipleTableRef.toggleRowSelection(row, undefined);                
+                }
+            });    
+        },
+
+        async createData(e){   
+            this.submitting = true; 
+                this.v$.$validate(); 
+                if (this.v$.$error) {
+                    this.submitting = false;
+                    return;
+                }
+            //detail 
+           
+            let plan= this.FormData.details;
+            if(plan.length >0){
+                for(let i=0; i< plan.length; i++){
+                    if(plan[i].quantity == "" || plan[i].quantity > plan[i].instock_amount){
+                        toast.warning(this.$t('num_of_plants')+ " is less than "+ plan[i].instock_amount, {
+                            position: toast.POSITION.TOP_CENTER,
+                            autoClose: 1000,
+                        });
+                        this.submitting = false;
+                        return;
+                    }
+                }
+            }               
+          
+            this.showapprover.forEach((value) => {
+                this.FormData.order.approver.push(value.userid);                
+            }); 
+            this.showcc.forEach((value) => {
+                this.FormData.order.cc.push(value.userid); 
+            }); 
+            let response = await authApi({
+                method: 'POST',
+                api: '/materialmanagement/outbound_order',
+                data: this.FormData
+            });
+            if(response.status == 201){              
+              //console.log(response.data.revenue_contract_id);              
+                const id = response.data.outbound_order_id; 
+                // const imgformData = new FormData();
+                // imgformData.append('outbound_order_id',id);
+                // this.pictureImages.forEach((value) => {
+                //     imgformData.append('picture', value);  
+                // });
+                // this.appendixImages.forEach((value) => {
+                //     imgformData.append('appendix', value);  
+                // });   
+                const imgformData = new FormData();
+                imgformData.append('outbound_order_id',id);
+                this.pictureImages.forEach((value) => {
+                     imgformData.append('picture', value.url);   
+                });
+                this.appendixImages.forEach((value) => {
+                    imgformData.append('appendix', value.url);  
+                });  
+                let imgResponse = await authApi({
+                method: 'POST',
+                api:  '/materialmanagement/outbound_order_datafiles',           
+                data: imgformData
+                });
+                if(imgResponse.status == 200){
+                    
+                    toast.success("OutboundOrder Insert successful !", {
+                    position: toast.POSITION.TOP_RIGHT,
+                    autoClose: 3000,
+                    });
+                    this.$router.back();
+                }
+            }
+        },
+    }
+    
+}
+</script>
+
+<style lang="scss" scoped>
+#content {
+    background-color: red !important;
+}
+a{
+    text-decoration: none;
+}
+.footer-main{
+   position: fixed;
+   right: 0;
+   bottom: 0;
+   width: 96%;
+   height: 60px;
+   border: 2px solid #eee;
+   color: white;
+   background-color: #FFFFFF;
+}
+.btn-footer{
+    padding: 5px 70px 5px 70px;
+    font-size: 13px;
+}
+.table-box{
+       box-sizing: border-box;
+       border: 1px solid #ebeef5;
+       border-right: none;
+       border-bottom: none;
+       vertical-align: inherit;
+       font-size: 14px;
+   }
+   thead{
+       background-color:#F6F7FB;
+   }
+   tfoot{
+       background-color:#F6F7FB;
+   }
+   .table_main_box{
+       width: 100%;
+       border-left: 1px solid gainsboro;
+       border-right: 1px solid gainsboro;
+       border-bottom: 1px solid gainsboro;
+   }
+   .footer-input{
+       width: 40px;
+   }
+   .block-title{
+   display: flex;
+   flex-wrap: wrap;
+   justify-content: center;
+   align-items: center;
+   align-content: space-between;
+   flex-direction: row;
+ }
+ .block-title strong{
+   flex-grow: 1;
+ }
+ .box-footer{
+   border: 1px solid #d5def0;
+   border-radius: 5px;
+   width: 100%;
+   padding: 7px;
+   text-align: center;
+   cursor: pointer;
+ }
+ .box-footer:hover{
+   background-color: #EDF3FE;
+ }
+ .input-inner{
+       width: 100%;
+       box-sizing: border-box;
+       border: 1px solid #ccc;
+       border-radius: 4px;
+       font-size: 14px;
+       background-color: white;
+       background-image: url('../../assets/images/searchicon.png');
+       background-size: 14px;
+       background-position: 10px 10px;
+       background-repeat: no-repeat;
+       padding: 12px 20px 12px 40px;
+       /* transition: width 0.4s ease-in-out; */
+       transition: border-color .2s cubic-bezier(cubic-bezier(0.645, 0.045, 0.355, 1));
+       height: 35px;
+   }
+   .li{
+       position: absolute;
+       background-color: #6D92FB;
+       color: white;
+       border-radius: 100%;
+       padding: 10px;
+       width: 50px;
+       height: 50px;
+       text-align: center;
+   }
+   .status{
+       position: absolute;
+       top: 70px;
+
+   }
+   #complilation_date{
+       width: 200px;
+   }
+   .left-side{
+       border-right: 1px solid black;
+   }
+   .select-box{
+       margin: auto;
+       padding-right: 300px;
+   }
+   .operation{
+       float: right;
+       box-sizing: border-box;
+       margin-right: 20px;
+   }
+   .operator{
+       display: flex;
+       flex-wrap: wrap;
+       justify-content: center;
+       align-items: center;
+       align-content: space-between;
+       flex-direction: row;
+   }
+   .operator p{
+       flex-grow: 1;
+   }
+   .caret-wrapper{
+       display: inline-flex;
+       flex-direction: column;
+       vertical-align: middle;
+       cursor: pointer;
+       font-size: 10px;
+   }
+</style>
