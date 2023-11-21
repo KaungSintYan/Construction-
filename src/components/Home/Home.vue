@@ -36,7 +36,7 @@
                                    </span>
                                    <div class="right-border">
                                        <h4 class="approve-count">0</h4>
-                                       <p class="approve-text">I Initiated </p>                                   
+                                       <p class="approve-text">I Initiated_ </p>                                   
                                    </div>                    
                                </div>                                
                            </div>
